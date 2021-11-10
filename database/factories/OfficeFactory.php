@@ -22,6 +22,7 @@ class OfficeFactory extends Factory
             'lat' => $this->faker->latitude,
             'lng' => $this->faker->longitude,
             'address_line1' => $this->faker->address,
+            'address_line2' => $this->faker->address,
             'approval_status' => Office::APPROVAL_APPROVE,
             'hidden' => false,
             'price_per_day' => $this->faker->numberBetween(1000, 2000),

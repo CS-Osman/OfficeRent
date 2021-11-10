@@ -1,5 +1,5 @@
 [x] Prepare Resources
-[] Tags
+[x] Tags
     - Routes
     - Controller
     - Tests

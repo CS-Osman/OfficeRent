@@ -20,11 +20,5 @@ class TagsControllerTest extends TestCase
 
         $this->assertNotNull($response->json('data')[0]['id']);
     }
-    
-    public function test_example()
-    {
-        $response = $this->get('/api/tags');
 
-        $response->assertStatus(200);
-    }
 }
