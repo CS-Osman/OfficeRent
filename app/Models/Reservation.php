@@ -11,6 +11,9 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    const STATUS_ACTIVE = 1;
+    const STATUS_CANCELLED = 2;
+    
     public $casts = [
         'price' => 'integer',
         'status' => 'integer',
