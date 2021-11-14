@@ -13,29 +13,26 @@ use Tests\TestCase;
 
 class OfficeControllerTest extends TestCase
 {
-
     use RefreshDatabase;
 
-    /** 
-     * @test
+    /**
+    * @test
     */
 
     public function itsListsAllOfficesInPaginateWay()
     {
-        Office::factory(3)->create();
+        Office::factory(30)->create();
 
         $response = $this->get('/api/offices');
         
-        $response->assertOk();
-
-        $response->assertJsonCount(3, 'data');
-
-        $this->assertNotNull($response->json('data')[0]['id']);
+        $response->assertOk()
+            ->assertJsonStructure(['data', 'meta', 'links'])
+            ->assertJsonCount(20, 'data')
+            ->assertJsonStructure(['data' => ['*' => ['id', 'title']]]);
     }
 
-
-    /** 
-     * @test
+    /**
+    * @test
     */
 
     public function itsOnlyListsOfficesThatAreNotHiddenAndApproved()
@@ -54,11 +51,10 @@ class OfficeControllerTest extends TestCase
         $this->assertNotNull($response->json('data')[0]['id']);
     }
    
-    /** 
-     * @test
+    /**
+    * @test
     */
-
-    public function itFilterByHostId()
+    public function itFilterByUserId()
     {
         Office::factory(3)->create();
 
@@ -67,7 +63,7 @@ class OfficeControllerTest extends TestCase
         $office = Office::factory()->for($host)->create();
 
         $response = $this->get(
-            '/api/offices?host_id='. $host->id
+            '/api/offices?user_id='. $host->id
         );
         
         $response->assertOk();
@@ -76,10 +72,10 @@ class OfficeControllerTest extends TestCase
         $this->assertEquals($office->id, $response->json('data')[0]['id']);
     }
 
-    /** 
-     * @test
+    /**
+    * @test
     */
-    public function itFilterByUserId()
+    public function itFilterByVisitorId()
     {
         Office::factory(3)->create();
 
@@ -92,7 +88,7 @@ class OfficeControllerTest extends TestCase
         Reservation::factory()->for($office)->for($user)->create();
 
         $response = $this->get(
-            '/api/offices?user_id='. $user->id
+            '/api/offices?visitor_id='. $user->id
         );
         
         $response->assertOk();
@@ -101,12 +97,11 @@ class OfficeControllerTest extends TestCase
         $this->assertEquals($office->id, $response->json('data')[0]['id']);
     }
 
-    /** 
+    /**
     * @test
     */
     public function itsIncludeImagesTagsUser()
     {
-
         $user = User::factory()->create();
         $tag = Tag::factory()->create();
 
@@ -115,7 +110,7 @@ class OfficeControllerTest extends TestCase
         $office->tags()->attach($tag);
 
         $office->images()->create(['path' => 'image.png']);
-
+        
         $response = $this->get(
             '/api/offices'
         );
@@ -126,7 +121,7 @@ class OfficeControllerTest extends TestCase
         $this->assertEquals($user->id, $response->json('data')[0]['user']['id']);
     }
 
-    /** 
+    /**
      * @test
     */
     public function itsReturnTheNumberOfActiveReservation()
@@ -145,18 +140,18 @@ class OfficeControllerTest extends TestCase
         $this->assertEquals(1, $response->json('data')[0]['reservations_count']);
     }
 
-     /**
-     * @test
-     */
+    /**
+    * @test
+    */
     public function itOrdersByDistanceWhenCoordinatesAreProvided()
     {
-       $office1 = Office::factory()->create([
+        $office1 = Office::factory()->create([
             'lat' => '39.74051727562952',
             'lng' => '-8.770375324893696',
             'title' => 'Leiria'
         ]);
 
-       $office2 = Office::factory()->create([
+        $office2 = Office::factory()->create([
             'lat' => '39.07753883078113',
             'lng' => '-9.281266331143293',
             'title' => 'Torres Vedras'
@@ -175,7 +170,7 @@ class OfficeControllerTest extends TestCase
         $this->assertEquals('Torres Vedras', $response->json('data')[1]['title']);
     }
 
-    /** 
+    /**
     * @test
     */
     public function ItsShowTheOffice()
@@ -192,7 +187,6 @@ class OfficeControllerTest extends TestCase
 
         Reservation::factory()->for($office)->create(['status' => Reservation::STATUS_ACTIVE]);
         Reservation::factory()->for($office)->create(['status' => Reservation::STATUS_CANCELLED]);
-        
         $response = $this->get('/api/offices/'.$office->id);
         
         $this->assertEquals(1, $response->json('data')['reservations_count']);
@@ -202,5 +196,4 @@ class OfficeControllerTest extends TestCase
         $this->assertCount(1, $response->json('data')['images']);
         $this->assertEquals($user->id, $response->json('data')['user']['id']);
     }
-}   
-
+}
