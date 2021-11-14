@@ -13,3 +13,4 @@ Route::get('/tags', [App\Http\Controllers\TagController::class , '__invoke']);
 
 //Offices
 Route::get('/offices', [App\Http\Controllers\OfficeController::class , 'index']);
+Route::get('/offices/{office}', [App\Http\Controllers\OfficeController::class , 'show']);
