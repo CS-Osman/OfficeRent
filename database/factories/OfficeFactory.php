@@ -27,7 +27,20 @@ class OfficeFactory extends Factory
             'hidden' => false,
             'price_per_day' => $this->faker->numberBetween(1000, 2000),
             'monthly_discount' => 0,
-
         ];
+    }
+
+    public function pending()
+    {
+        return $this->state([
+            'APPROVAL_PENDING' => Office::APPROVAL_PENDING
+        ]);
+    }
+
+    public function hidden()
+    {
+        return $this->state([
+            'hidden' => true,
+        ]);
     }
 }
